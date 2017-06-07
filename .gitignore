@@ -1,44 +1,81 @@
- settings
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
+###########################
+# ignore generated binaries
+# but not the data folder
+###########################
 
-## Other
-*.xccheckout
-*.moved-aside
-*.xcuserstate
-*.xcscmblueprint
+/bin/*
+!/bin/data/
 
+#########
+# general
+#########
 
+[Bb]uild/
+[Oo]bj/
+*.o
+[Dd]ebug*/
+[Rr]elease*/
+*.mode*
+*.app/
+*.pyc
 .svn/
-obj/
-bin/
-build/
-!data/
+*.log
+
+########################
+# IDE files which should
+# be ignored
+########################
+
+# XCode
+*.pbxuser
+*.perspective
+*.perspectivev3
+*.mode1v3
+*.mode2v3
+# XCode 4
+xcuserdata
+*.xcworkspace
+
+# Code::Blocks
+*.depend
+*.layout
+
+# Visual Studio
+*.sdf
+*.opensdf
+*.suo
+*.pdb
+*.ilk
+*.aps
+ipch/
+
+# Eclipse
+.metadata
+local.properties
+.externalToolBuilders
+
+##################
+# operating system
+##################
+
+# Linux
+*~
+# KDE
+.directory
+.AppleDouble
+
+# OSX
 .DS_Store
-shape_predictor_68_face_landmarks.dat
-*.idea
-*.iml
+*.swp
+*~.nib
+# Thumbnails
+._*
 
-config.make
-project.pbxproj
-Makefile
-Project.xcconfig
-openFrameworks-Info.plist
-*.xcodeproj
-project.xcworkspace
-*.xcscheme
+# Windows
+# Image file caches
+Thumbs.db
+# Folder config file
+Desktop.ini
 
-*.gradle
-gradlew
-gradlew.bat
-gradle
-res
-
-
+# Android
+.csettings
