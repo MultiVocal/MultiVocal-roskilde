@@ -21,13 +21,18 @@ struct file{
 class FileUploader : public ofThread{
 public:
     FileUploader(std::string clientId){
-//        jsonQueue.openLocal("upload_queue.json");
+        // set client id
+        this->clientId = clientId;
+        
+        
+        // Open local queue
+        jsonQueue.openLocal("upload_queue.json");
         
         // TODO: iterate backwards
         for(auto& i : jsonQueue){
             file file;
-            file.path = i.asString();
-            file.transcriptionId = "";
+            file.path = i["path"].asString();
+            file.transcriptionId = i["transcriptionId"].asString();
             queue.push(file);
         }
     }
@@ -75,13 +80,14 @@ private:
         /* get a curl handle */
         curl = curl_easy_init();
         if(curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, "http://madsnewsio.eu.ngrok.io/transcription");
-            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path);
+            curl_easy_setopt(curl, CURLOPT_URL, "https://madsnewsio.eu.ngrok.io/api/recording");
+            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path); // FIXME
             const char *curlField = str.c_str();
 
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
             
             res = curl_easy_perform(curl);
+            
             /* Check for errors */
             if(res != CURLE_OK){
                 fprintf(stderr, "curl_easy_perform() failed: %s\n",
@@ -112,7 +118,6 @@ private:
     void threadedFunction(){
         while(queue.size() != 0){
             bool uploaded = upload(queue.front());
-            
             if(uploaded){
                 queue.pop();
             }
@@ -121,6 +126,7 @@ private:
 
     std::queue<file> queue;
     ofxJSON jsonQueue;
+    std::string clientId = "";
 };
 
 

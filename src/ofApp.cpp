@@ -97,6 +97,7 @@ void ofApp::stopRecording(){
         // Upload        
         fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
         
+        std::cout << transcriptions[currentTranscriptionIndex]["transcription_id"].asString() << endl;
         // todo: if recording OK
         goToNextTranscription();
     }else{
