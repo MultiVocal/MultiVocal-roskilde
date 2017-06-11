@@ -11,29 +11,48 @@
 
 #include "ofMain.h"
 #include "ofxJSON.h"
+#include "ofxHttpUtils.h"
+#include <curl/curl.h>
+
+struct file{
+    std::string transcriptionId;
+    std::string path;
+};
 
 class FileUploader : public ofThread{
 public:
-    FileUploader(){
+    FileUploader(std::string clientId){
 //        jsonQueue.openLocal("upload_queue.json");
         
         // TODO: iterate backwards
         for(auto& i : jsonQueue){
-            queue.push(i.asString());
+            file file;
+            file.path = i.asString();
+            file.transcriptionId = "";
+            queue.push(file);
         }
     }
+    
+    FileUploader(const FileUploader &obj){
+        
+    };
     
     ~FileUploader(){
         jsonQueue.save("upload_queue.json");
     }
     
-    void addFile(std::string path){
+    void addFile(std::string path, std::string transcriptionId){
         // Add to queue
-        queue.push(path);
+        file file;
+        file.path = path;
+        file.path = transcriptionId;
+        queue.push(file);
         
         // Add to JSON-queue
-        Json::Value value = path;
-        jsonQueue.append(value);
+        ofxJSONElement element;
+        element["path"] = path;
+        element["transcriptionId"] = transcriptionId;
+        jsonQueue.append(element);
     }
     
     int getQueueSize(){
@@ -47,19 +66,44 @@ public:
     }
     
 private:
-    bool upload(std::string path){
-        std::string compareStr = "{\"status\":0,\"message\":\"succesfully added file\"}";
-        std::string command;
-        command = "curl -X POST http://madsnewsio.eu.ngrok.io/transcription  'content-type: multipart/form-data;' -F transcription_id=arctic_a0001 -F 'transcription_text=other stuff' -F file=@";
-        command += path;
-//        string returnString = ofSystem(command);
-//        ofLog(OF_LOG_NOTICE) << "Uploaded file " << path;
+    bool upload(file file){
+        bool uploadSuccess = false;
+        CURL *curl;
+        CURLcode res;
         
-        std::string resp = exec(command.c_str());
+        /* In windows, this will init the winsock stuff */
+        curl_global_init(CURL_GLOBAL_ALL);
         
-        std::cout << "boolean: " << resp << endl;
-        
-        return true;
+        /* get a curl handle */
+        curl = curl_easy_init();
+        if(curl) {
+            /* First set the URL that is about to receive our POST. This URL can
+             just as well be a https:// URL if that is what should receive the
+             data. */
+            curl_easy_setopt(curl, CURLOPT_URL, "http://madsnewsio.eu.ngrok.io/transcription");
+            /* Now specify the POST data */
+            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path);
+            const char *curlField = str.c_str();
+
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
+            
+            /* Perform the request, res will get the return code */
+            res = curl_easy_perform(curl);
+            /* Check for errors */
+            if(res != CURLE_OK){
+                fprintf(stderr, "curl_easy_perform() failed: %s\n",
+                        curl_easy_strerror(res));
+                uploadSuccess = false;
+            }else{
+                uploadSuccess = true;
+            }
+            
+            /* always cleanup */ 
+            curl_easy_cleanup(curl);
+        }
+        curl_global_cleanup();
+//        
+        return uploadSuccess;
     }
     
     std::string exec(const char* cmd) {
@@ -84,10 +128,8 @@ private:
         }
     };
 
-    
-    std::queue<std::string> queue;
+    std::queue<file> queue;
     ofxJSON jsonQueue;
-    
 };
 
 

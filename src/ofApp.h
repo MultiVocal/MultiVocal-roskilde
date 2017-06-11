@@ -35,6 +35,7 @@ public:
     int currentTranscriptionIndex = 0;
     ofxFontStash font;
     bool bDebugDraw = true;
+    std::string clientId = "RoskildeFestival-2017";
     
     // sound recording
     ofxVideoRecorder audioRecorder;
@@ -42,5 +43,5 @@ public:
     int inputChannels = 2;
     int sampleRate = 44100;
 
-    FileUploader fileUploader;
+    FileUploader fileUploader = FileUploader(clientId);
 };

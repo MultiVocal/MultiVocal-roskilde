@@ -1,3 +1,4 @@
 ofxFontStash
+ofxHttpUtils
 ofxJSON
 ofxVideoRecorder

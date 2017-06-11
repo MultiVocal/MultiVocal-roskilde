@@ -95,9 +95,7 @@ void ofApp::stopRecording(){
     
     if(file.getSize() > 10000){
         // Upload        
-        fileUploader.addFile(path);
-        
-        
+        fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
         
         // todo: if recording OK
         goToNextTranscription();
