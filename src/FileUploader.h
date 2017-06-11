@@ -11,7 +11,6 @@
 
 #include "ofMain.h"
 #include "ofxJSON.h"
-#include "ofxHttpUtils.h"
 #include <curl/curl.h>
 
 struct file{
@@ -71,23 +70,17 @@ private:
         CURL *curl;
         CURLcode res;
         
-        /* In windows, this will init the winsock stuff */
         curl_global_init(CURL_GLOBAL_ALL);
         
         /* get a curl handle */
         curl = curl_easy_init();
         if(curl) {
-            /* First set the URL that is about to receive our POST. This URL can
-             just as well be a https:// URL if that is what should receive the
-             data. */
             curl_easy_setopt(curl, CURLOPT_URL, "http://madsnewsio.eu.ngrok.io/transcription");
-            /* Now specify the POST data */
             std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path);
             const char *curlField = str.c_str();
 
             curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
             
-            /* Perform the request, res will get the return code */
             res = curl_easy_perform(curl);
             /* Check for errors */
             if(res != CURLE_OK){
@@ -98,11 +91,9 @@ private:
                 uploadSuccess = true;
             }
             
-            /* always cleanup */ 
             curl_easy_cleanup(curl);
         }
         curl_global_cleanup();
-//        
         return uploadSuccess;
     }
     
