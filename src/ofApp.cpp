@@ -6,6 +6,10 @@ void ofApp::setup(){
     font.setup("font/Calibre-Semibold.ttf", 1.0, 1024, false, 8, 1.0);
     
     // Setup audio recorder
+    //    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg"));
+    audioRecorder.setAudioCodec("mp3");
+    audioRecorder.setAudioBitrate("192k");
+    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
     
     // Load transcriptions
     transcriptions.openLocal("transcriptions.json");
@@ -45,6 +49,44 @@ void ofApp::draw(){
         s << endl;
         ofDrawBitmapStringHighlight(s.str(), 10, 10);
     }
+    
+    //
+}
+
+//--------------------------------------------------------------
+void ofApp::startRecording(){
+    
+    std::string timeStampFormat = std::string("%d_%b_%Y_" + ofToString("%Hh_") + ofToString("%Mm_") + ofToString("%Ss"));
+    //    Create directory if it doesn't exist
+    std::string fileName = ofToString(currentTranscriptionIndex) + "_" + ofGetTimestampString(timeStampFormat) + ".mp3";
+    std::string path = "audio_recordings/";
+    ofDirectory dir(path);
+    if(!dir.exists()){
+        dir.create(true);
+    }
+    // Start recording
+    audioRecorder.setup(path + fileName, 0,0,0, sampleRate, inputChannels); // no video
+    audioRecorder.start();
+    
+    // Log
+    ofLog(OF_LOG_NOTICE) << "Recording started for index: " + ofToString(currentTranscriptionIndex) << endl;
+}
+
+//--------------------------------------------------------------
+void ofApp::stopRecording(){
+    audioRecorder.close();
+    
+    ofLog(OF_LOG_NOTICE) << "Recording stopped for index: " + ofToString(currentTranscriptionIndex) << endl;
+    
+    // todo: if recording OK
+    goToNextTranscription();
+}
+
+//--------------------------------------------------------------
+void ofApp::audioIn(float *input, int bufferSize, int nChannels){
+    if(audioRecorder.isRecording()){
+        audioRecorder.addAudioSamples(input, bufferSize, nChannels);
+    }
 }
 
 //--------------------------------------------------------------
@@ -65,8 +107,8 @@ void ofApp::goToNextTranscription(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-    if(key == 'g' || key == 'G'){
-        std::cout << "Button pressed" << endl;
+    if((key == 'g' || key == 'G') && !audioRecorder.isRecording()){
+        startRecording();
     }
 }
 
@@ -74,6 +116,10 @@ void ofApp::keyPressed(int key){
 void ofApp::keyReleased(int key){
     if(key == ' '){
         goToNextTranscription();
+    }
+    
+    if((key == 'g' || key == 'G') && audioRecorder.isRecording()){
+        stopRecording();
     }
     
     if(key == 'd' || key == 'D'){

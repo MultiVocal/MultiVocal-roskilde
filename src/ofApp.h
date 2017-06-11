@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxFontStash.h"
 #include "ofxJSON.h"
+#include "ofxVideoRecorder.h"
 
 class ofApp : public ofBaseApp{
     
@@ -10,7 +11,11 @@ public:
     void setup();
     void update();
     void draw();
+    void startRecording();
+    void stopRecording();
     void goToNextTranscription();
+    void audioIn(float * input, int bufferSize, int nChannels);
+
     
     void keyPressed(int key);
     void keyReleased(int key);
@@ -28,4 +33,11 @@ public:
     int currentTranscriptionIndex = 0;
     ofxFontStash font;
     bool bDebugDraw = true;
+    
+    // sound recording
+    ofxVideoRecorder audioRecorder;
+    ofSoundStream soundStream;
+    int inputChannels = 2;
+    int sampleRate = 44100;
+
 };
