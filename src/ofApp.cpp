@@ -17,13 +17,12 @@ void ofApp::setup(){
     // Load transcription index from we left off last time
     ofxJSON json;
     json.openLocal("config.json");
-    currentTranscriptionIndex = json["transcriptionIndex"].asInt();
-    std::cout << transcriptions.size() << endl;
+    currentTranscriptionIndex = json["transcriptionIndex"].asInt();    
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+    fileUploader.update();
 }
 
 //--------------------------------------------------------------
@@ -53,7 +52,8 @@ void ofApp::draw(){
         stringstream s;
         s << "Transcription #" + ofToString(currentTranscriptionIndex);
         s << "\nFPS: " + ofToString(ofGetFrameRate());
-        s << "\nQueue size: " + ofToString(audioRecorder.getVideoQueueSize());
+        s << "\nAudio queue size: " + ofToString(audioRecorder.getVideoQueueSize());
+        s << "\nFile queue size: " + ofToString(fileUploader.getQueueSize());
         s << endl;
         ofDrawBitmapStringHighlight(s.str(), 10, 10);
     }
@@ -95,7 +95,9 @@ void ofApp::stopRecording(){
     
     if(file.getSize() > 10000){
         // Upload        
-        fileUploader.upload(path);
+        fileUploader.addFile(path);
+        
+        
         
         // todo: if recording OK
         goToNextTranscription();
