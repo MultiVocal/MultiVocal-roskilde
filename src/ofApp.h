@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "FileUploader.h"
 #include "ofxFontStash.h"
 #include "ofxJSON.h"
 #include "ofxVideoRecorder.h"
@@ -14,6 +15,7 @@ public:
     void startRecording();
     void stopRecording();
     void goToNextTranscription();
+    void upload(std::string path);
     void audioIn(float * input, int bufferSize, int nChannels);
 
     
@@ -40,4 +42,5 @@ public:
     int inputChannels = 2;
     int sampleRate = 44100;
 
+    FileUploader fileUploader;
 };

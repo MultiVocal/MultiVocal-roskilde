@@ -23,7 +23,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    //    std::cout << transcriptions[currentTranscriptionIndex]["transcription_text"] << endl;
+
 }
 
 //--------------------------------------------------------------
@@ -39,23 +39,34 @@ void ofApp::draw(){
     int x = 0;
     int margin = 40;
     int y = ofGetHeight()/2;
-    font.drawMultiLineColumn(transcription, size, margin, y, ofGetWidth()-margin, numLines, false, 1,true, &wordsWereCropped,true);
+    
+    if(audioRecorder.isRecording()){
+        ofSetColor(0);
+    }else{
+        ofSetColor(ofColor::darkGray);
+    }
+    
+    font.drawMultiLineColumn(transcription, size, margin, y, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
     
     // Draw info
     if(bDebugDraw){
         stringstream s;
         s << "Transcription #" + ofToString(currentTranscriptionIndex);
         s << "\nFPS: " + ofToString(ofGetFrameRate());
+        s << "\nQueue size: " + ofToString(audioRecorder.getVideoQueueSize());
         s << endl;
         ofDrawBitmapStringHighlight(s.str(), 10, 10);
     }
     
-    //
+    // draw recording button:
+    if(audioRecorder.isRecording()){
+        ofSetColor(127+(sin(ofGetFrameNum()*0.03)*127),0,0);
+        ofDrawEllipse(ofGetWidth()-50, 50, 25, 25);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::startRecording(){
-    
     std::string timeStampFormat = std::string("%d_%b_%Y_" + ofToString("%Hh_") + ofToString("%Mm_") + ofToString("%Ss"));
     //    Create directory if it doesn't exist
     std::string fileName = ofToString(currentTranscriptionIndex) + "_" + ofGetTimestampString(timeStampFormat) + ".mp3";
@@ -74,12 +85,24 @@ void ofApp::startRecording(){
 
 //--------------------------------------------------------------
 void ofApp::stopRecording(){
+    std::string path = audioRecorder.getMoviePath();
     audioRecorder.close();
     
     ofLog(OF_LOG_NOTICE) << "Recording stopped for index: " + ofToString(currentTranscriptionIndex) << endl;
     
-    // todo: if recording OK
-    goToNextTranscription();
+    ofFile file;
+    file.open(path);
+    
+    if(file.getSize() > 10000){
+        // Upload        
+        fileUploader.upload(path);
+        
+        // todo: if recording OK
+        goToNextTranscription();
+    }else{
+        // Delete file
+        file.remove();
+    }
 }
 
 //--------------------------------------------------------------
@@ -125,7 +148,6 @@ void ofApp::keyReleased(int key){
     if(key == 'd' || key == 'D'){
         bDebugDraw = !bDebugDraw;
     }
-    
 }
 
 //--------------------------------------------------------------
