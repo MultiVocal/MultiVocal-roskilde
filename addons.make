@@ -1,3 +1,3 @@
-ofxCenteredTrueTypeFont
+ofxFontStash
 ofxJSON
 ofxVideoRecorder
