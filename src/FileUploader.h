@@ -26,6 +26,7 @@ public:
         
         
         // Open local queue
+        ofxJSON jsonQueue;
         jsonQueue.openLocal("upload_queue.json");
         
         // TODO: iterate backwards
@@ -42,21 +43,27 @@ public:
     };
     
     ~FileUploader(){
-        jsonQueue.save("upload_queue.json");
+        // Add all elements to JSON
+        ofxJSON json;
+        
+        // Add to JSON-queue
+        while(queue.size() != 0){
+            ofxJSONElement element;
+            element["path"] = queue.front().path;
+            element["transcriptionId"] = queue.front().transcriptionId;
+            json.append(element);
+            queue.pop();
+        }
+
+        json.save("upload_queue.json");
     }
     
     void addFile(std::string path, std::string transcriptionId){
         // Add to queue
         file file;
         file.path = path;
-        file.path = transcriptionId;
+        file.transcriptionId = transcriptionId;
         queue.push(file);
-        
-        // Add to JSON-queue
-        ofxJSONElement element;
-        element["path"] = path;
-        element["transcriptionId"] = transcriptionId;
-        jsonQueue.append(element);
     }
     
     int getQueueSize(){
@@ -71,7 +78,7 @@ public:
     
 private:
     bool upload(file file){
-        bool uploadSuccess = false;
+        bool uploadSuccess = true;
         CURL *curl;
         CURLcode res;
         
@@ -80,12 +87,12 @@ private:
         /* get a curl handle */
         curl = curl_easy_init();
         if(curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, "https://madsnewsio.eu.ngrok.io/api/recording");
-            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path); // FIXME
+            curl_easy_setopt(curl, CURLOPT_URL, "http://httpbin.org/post");
+            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path);
             const char *curlField = str.c_str();
-
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
             
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
+
             res = curl_easy_perform(curl);
             
             /* Check for errors */
@@ -101,18 +108,8 @@ private:
         }
         curl_global_cleanup();
         return uploadSuccess;
-    }
-    
-    std::string exec(const char* cmd) {
-        std::array<char, 128> buffer;
-        std::string result;
-        std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
-        if (!pipe) throw std::runtime_error("popen() failed!");
-        while (!feof(pipe.get())) {
-            if (fgets(buffer.data(), 128, pipe.get()) != NULL)
-                result += buffer.data();
-        }
-        return result;
+        
+        
     }
     
     void threadedFunction(){
@@ -125,7 +122,6 @@ private:
     };
 
     std::queue<file> queue;
-    ofxJSON jsonQueue;
     std::string clientId = "";
 };
 

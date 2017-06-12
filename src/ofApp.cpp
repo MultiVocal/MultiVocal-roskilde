@@ -26,6 +26,16 @@ void ofApp::update(){
 }
 
 //--------------------------------------------------------------
+void ofApp::exit(){
+    // Save progress in config file
+    ofxJSON json;
+    json.openLocal("config.json");
+    json["transcriptionIndex"] = currentTranscriptionIndex;
+    json.save("config.json");
+    
+}
+
+//--------------------------------------------------------------
 void ofApp::draw(){
     ofBackground(255);
     
@@ -88,7 +98,6 @@ void ofApp::stopRecording(){
     std::string path = audioRecorder.getMoviePath();
     audioRecorder.close();
     
-    ofLog(OF_LOG_NOTICE) << "Recording stopped for index: " + ofToString(currentTranscriptionIndex) << endl;
     
     ofFile file;
     file.open(path);
@@ -97,7 +106,6 @@ void ofApp::stopRecording(){
         // Upload        
         fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
         
-        std::cout << transcriptions[currentTranscriptionIndex]["transcription_id"].asString() << endl;
         // todo: if recording OK
         goToNextTranscription();
     }else{
@@ -122,11 +130,6 @@ void ofApp::goToNextTranscription(){
     if(currentTranscriptionIndex >= transcriptions.size()){
         currentTranscriptionIndex = 0;
     }
-    
-    // Save in config
-    ofxJSON json;
-    json["transcriptionIndex"] = currentTranscriptionIndex;
-    json.save("config.json");
 }
 
 //--------------------------------------------------------------

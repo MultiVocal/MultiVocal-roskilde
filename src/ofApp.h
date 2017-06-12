@@ -12,6 +12,7 @@ public:
     void setup();
     void update();
     void draw();
+    void exit();
     void startRecording();
     void stopRecording();
     void goToNextTranscription();
