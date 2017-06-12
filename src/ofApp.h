@@ -41,6 +41,7 @@ public:
     // sound recording
     ofxVideoRecorder audioRecorder;
     ofSoundStream soundStream;
+    bool bEncodeMp3 = false;
     int inputChannels = 2;
     int sampleRate = 44100;
 

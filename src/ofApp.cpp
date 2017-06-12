@@ -5,19 +5,27 @@ void ofApp::setup(){
     // Setup font
     font.setup("font/Calibre-Semibold.ttf", 1.0, 1024, false, 8, 1.0);
     
-    // Setup audio recorder
-    //    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg"));
-    audioRecorder.setAudioCodec("mp3");
-    audioRecorder.setAudioBitrate("192k");
-    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
-    
     // Load transcriptions
     transcriptions.openLocal("transcriptions.json");
     
     // Load transcription index from we left off last time
     ofxJSON json;
     json.openLocal("config.json");
-    currentTranscriptionIndex = json["transcriptionIndex"].asInt();    
+    currentTranscriptionIndex = json["transcriptionIndex"].asInt();
+    
+    // Setup audio recorder
+    //    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg"));
+    bEncodeMp3 = json["mp3_ecode"].asBool();
+    if(bEncodeMp3){
+        audioRecorder.setAudioCodec("mp3");
+        audioRecorder.setAudioBitrate("192k");
+    }else{
+        audioRecorder.setAudioCodec("pcm_s16le");
+        audioRecorder.setAudioBitrate("1411k");
+    }
+    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
+    
+    ofSetFrameRate(60);
 }
 
 //--------------------------------------------------------------
@@ -79,7 +87,14 @@ void ofApp::draw(){
 void ofApp::startRecording(){
     std::string timeStampFormat = std::string("%d_%b_%Y_" + ofToString("%Hh_") + ofToString("%Mm_") + ofToString("%Ss"));
     //    Create directory if it doesn't exist
-    std::string fileName = ofToString(currentTranscriptionIndex) + "_" + ofGetTimestampString(timeStampFormat) + ".mp3";
+    
+    std::string fileExt;
+    if(bEncodeMp3){
+        fileExt = ".mp3";
+    }else{
+        fileExt = ".wav";
+    }
+    std::string fileName = ofToString(currentTranscriptionIndex) + "_" + ofGetTimestampString(timeStampFormat) + fileExt;
     std::string path = "audio_recordings/";
     ofDirectory dir(path);
     if(!dir.exists()){
@@ -103,7 +118,7 @@ void ofApp::stopRecording(){
     file.open(path);
     
     if(file.getSize() > 10000){
-        // Upload        
+        // Upload
         fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
         
         // todo: if recording OK
