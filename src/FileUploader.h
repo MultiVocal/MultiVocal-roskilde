@@ -20,9 +20,10 @@ struct file{
 
 class FileUploader : public ofThread{
 public:
-    FileUploader(std::string clientId){
+    void setup(std::string clientId, std::string url){
         // set client id
         this->clientId = clientId;
+        this->url = url;
         
         
         // Open local queue
@@ -37,11 +38,7 @@ public:
             queue.push(file);
         }
     }
-    
-    FileUploader(const FileUploader &obj){
         
-    };
-    
     ~FileUploader(){
         // Add all elements to JSON
         ofxJSON json;
@@ -81,12 +78,9 @@ private:
         bool uploadSuccess = true;
 
         ofFilePath path;
-        std::string url = "https://madsnewsio.eu.ngrok.io/api/recording";
         
         auto res = ofSystem("/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py") +
-                            " -f"  + file.path + " -u " + url);
-        
-        std::cout << res << endl;
+                            " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
         
         return uploadSuccess;
     }
@@ -102,6 +96,7 @@ private:
 
     std::queue<file> queue;
     std::string clientId = "";
+    std::string url = "";
 };
 
 

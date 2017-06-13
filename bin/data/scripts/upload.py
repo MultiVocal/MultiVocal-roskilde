@@ -12,7 +12,8 @@ def main(argv):
     transcription_id = ""
 
     try:
-        opts, args = getopt.getopt(argv, "hf:u:", ["file=", "url="])
+        opts, args = getopt.getopt(
+            argv, "hf:u:t:", ["file=", "url=", "transcription_id="])
     except getopt.GetoptError:
         print 'test.py -i <inputfile> -o <outputfile>'
         sys.exit(2)
@@ -24,14 +25,8 @@ def main(argv):
             file_name = arg
         elif opt in ("-u", "--url"):
             url = arg
-
-    if file_name.endswith('.mp3'):
-        transcription_id = file_name.replace(".mp3", "")
-    if file_name.endswith('.wav'):
-        transcription_id = file_name.replace(".wav", "")
-
-    transcription_id = os.path.basename(transcription_id)
-    print(transcription_id)
+        elif opt in ("-t", "--transcription_id"):
+            transcription_id = arg
 
     file_ = {'file': (file_name, open(file_name, 'rb'))}
     r = requests.post(url, files=file_, data={"transcription_id":

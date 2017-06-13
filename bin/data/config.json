@@ -1,2 +1,5 @@
-{"mp3_encode":false,"transcriptionIndex":282}
-
+{
+    "mp3_encode": false,
+    "transcriptionIndex": 282,
+    "endpoint_url": ""
+}

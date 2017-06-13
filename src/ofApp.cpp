@@ -9,13 +9,13 @@ void ofApp::setup(){
     transcriptions.openLocal("transcriptions.json");
     
     // Load transcription index from we left off last time
-    ofxJSON json;
-    json.openLocal("config.json");
-    currentTranscriptionIndex = json["transcriptionIndex"].asInt();
+    ofxJSON jsonConfig;
+    jsonConfig.openLocal("config.json");
+    currentTranscriptionIndex = jsonConfig["transcriptionIndex"].asInt();
     
     // Setup audio recorder
     //    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg"));
-    bEncodeMp3 = json["mp3_ecode"].asBool();
+    bEncodeMp3 = jsonConfig["mp3_ecode"].asBool();
     if(bEncodeMp3){
         audioRecorder.setAudioCodec("mp3");
         audioRecorder.setAudioBitrate("192k");
@@ -24,6 +24,9 @@ void ofApp::setup(){
         audioRecorder.setAudioBitrate("1411k");
     }
     soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
+    
+    // setup uploader
+    fileUploader.setup(clientId, jsonConfig["endpoint_url"].asString());
     
     ofSetFrameRate(60);
 }

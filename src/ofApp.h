@@ -45,5 +45,5 @@ public:
     int inputChannels = 2;
     int sampleRate = 44100;
 
-    FileUploader fileUploader = FileUploader(clientId);
+    FileUploader fileUploader;
 };
