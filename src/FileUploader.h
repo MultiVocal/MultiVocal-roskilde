@@ -79,37 +79,16 @@ public:
 private:
     bool upload(file file){
         bool uploadSuccess = true;
-        CURL *curl;
-        CURLcode res;
-        
-        curl_global_init(CURL_GLOBAL_ALL);
-        
-        /* get a curl handle */
-        curl = curl_easy_init();
-        if(curl) {
-            curl_easy_setopt(curl, CURLOPT_URL, "http://httpbin.org/post");
-            std::string str = ("'content-type: multipart/form-data;' -F transcription_id=" + file.transcriptionId + " -F 'transcription_text=other stuff' -F file=@" + file.path);
-            const char *curlField = str.c_str();
-            
-            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, curlField);
 
-            res = curl_easy_perform(curl);
-            
-            /* Check for errors */
-            if(res != CURLE_OK){
-                fprintf(stderr, "curl_easy_perform() failed: %s\n",
-                        curl_easy_strerror(res));
-                uploadSuccess = false;
-            }else{
-                uploadSuccess = true;
-            }
-            
-            curl_easy_cleanup(curl);
-        }
-        curl_global_cleanup();
+        ofFilePath path;
+        std::string url = "https://madsnewsio.eu.ngrok.io/api/recording";
+        
+        auto res = ofSystem("/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py") +
+                            " -f"  + file.path + " -u " + url);
+        
+        std::cout << res << endl;
+        
         return uploadSuccess;
-        
-        
     }
     
     void threadedFunction(){
