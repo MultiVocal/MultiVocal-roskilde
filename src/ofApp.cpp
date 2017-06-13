@@ -26,7 +26,11 @@ void ofApp::setup(){
     soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
     
     // setup uploader
-    fileUploader.setup(clientId, jsonConfig["endpoint_url"].asString());
+    bool uploadSetup = fileUploader.setup(clientId, jsonConfig["endpoint_url"].asString());
+    if(!uploadSetup){
+        ofLog(OF_LOG_ERROR) << "fileUploader error" << endl;
+        exit();
+    }
     
     ofSetFrameRate(60);
 }

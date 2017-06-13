@@ -20,11 +20,15 @@ struct file{
 
 class FileUploader : public ofThread{
 public:
-    void setup(std::string clientId, std::string url){
+    bool setup(std::string clientId, std::string url){
         // set client id
         this->clientId = clientId;
         this->url = url;
         
+        if(url == "" || clientId == ""){
+            std::cout << "No url assigned in config" << endl;
+            return false;
+        }
         
         // Open local queue
         ofxJSON jsonQueue;
@@ -38,7 +42,7 @@ public:
             queue.push(file);
         }
     }
-        
+    
     ~FileUploader(){
         // Add all elements to JSON
         ofxJSON json;

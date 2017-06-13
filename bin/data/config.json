@@ -1,5 +1,2 @@
-{
-    "mp3_encode": false,
-    "transcriptionIndex": 282,
-    "endpoint_url": ""
-}
+{"endpoint_url":"https://madsnewsio.eu.ngrok.io/api/recording","mp3_encode":false,"transcriptionIndex":284}
+
