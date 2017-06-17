@@ -14,14 +14,21 @@ void ofApp::setup(){
     currentTranscriptionIndex = jsonConfig["transcriptionIndex"].asInt();
     
     // Setup audio recorder
-    //    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg"));
+#ifdef TARGET_OSX
+    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
+#else
+    audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
+#endif
+    
     bEncodeMp3 = jsonConfig["mp3_ecode"].asBool();
     if(bEncodeMp3){
         audioRecorder.setAudioCodec("mp3");
         audioRecorder.setAudioBitrate("192k");
+        minRecordingSize = 2.739;
     }else{
         audioRecorder.setAudioCodec("pcm_s16le");
         audioRecorder.setAudioBitrate("1411k");
+        minRecordingSize = 20000;
     }
     soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
     
@@ -128,9 +135,9 @@ void ofApp::stopRecording(){
     std::string path = audioRecorder.getMoviePath();
     audioRecorder.close();
     
-    ofFile file = ofFile(path);    
+    ofFile file = ofFile(path);
     if(file.exists()){
-        if(file.getSize() > 10000){
+        if(file.getSize() > minRecordingSize){
             // Upload
             fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
             

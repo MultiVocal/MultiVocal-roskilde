@@ -44,6 +44,7 @@ public:
     bool bEncodeMp3 = false;
     int inputChannels = 2;
     int sampleRate = 44100;
+    double minRecordingSize = 0;
 
     FileUploader fileUploader;
 };
