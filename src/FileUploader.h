@@ -11,7 +11,6 @@
 
 #include "ofMain.h"
 #include "ofxJSON.h"
-#include <curl/curl.h>
 
 struct file{
     std::string transcriptionId;
