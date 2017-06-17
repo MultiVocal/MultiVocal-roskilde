@@ -27,6 +27,7 @@ void ofApp::setup(){
     
     // setup uploader
     bool uploadSetup = fileUploader.setup(clientId, jsonConfig["endpoint_url"].asString());
+    
     if(!uploadSetup){
         ofLog(OF_LOG_ERROR) << "fileUploader error" << endl;
         exit();
@@ -78,7 +79,14 @@ void ofApp::draw(){
         s << "Transcription #" + ofToString(currentTranscriptionIndex);
         s << "\nFPS: " + ofToString(ofGetFrameRate());
         s << "\nAudio queue size: " + ofToString(audioRecorder.getVideoQueueSize());
+        if(bEncodeMp3){
+            s << "\nMP3 encoding enabled";
+        }else{
+            s << "\nwav encoding enabled";
+        }
+        s << "\nUrl: " + ofToString(fileUploader.getUrl());
         s << "\nFile queue size: " + ofToString(fileUploader.getQueueSize());
+        s << "\nLast upload: " + ofToString(fileUploader.getLastUploadCode());
         s << endl;
         ofDrawBitmapStringHighlight(s.str(), 10, 10);
     }
@@ -120,19 +128,15 @@ void ofApp::stopRecording(){
     std::string path = audioRecorder.getMoviePath();
     audioRecorder.close();
     
-    
-    ofFile file;
-    file.open(path);
-    
-    if(file.getSize() > 10000){
-        // Upload
-        fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
-        
-        // todo: if recording OK
-        goToNextTranscription();
-    }else{
-        // Delete file
-        file.remove();
+    ofFile file = ofFile(path);    
+    if(file.exists()){
+        if(file.getSize() > 10000){
+            // Upload
+            fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
+            
+            // todo: if recording OK
+            goToNextTranscription();
+        }
     }
 }
 
@@ -165,6 +169,10 @@ void ofApp::keyPressed(int key){
 void ofApp::keyReleased(int key){
     if(key == ' '){
         goToNextTranscription();
+    }
+    
+    if(key == 'f' || key == 'F'){
+        ofToggleFullscreen();
     }
     
     if((key == 'g' || key == 'G') && audioRecorder.isRecording()){

@@ -7,7 +7,7 @@
 !/bin/data/
 /bin/data/audio_recordings/
 /bin/data/upload_queue.json
-/bin/data/config.json
+#/bin/data/config.json
 
 #########
 # general

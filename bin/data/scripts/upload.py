@@ -32,7 +32,7 @@ def main(argv):
     r = requests.post(url, files=file_, data={"transcription_id":
                                               transcription_id})
 
-    print (r.text)
+    print (r.status_code)
 
 
 if __name__ == "__main__":

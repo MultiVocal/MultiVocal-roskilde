@@ -24,7 +24,6 @@ public:
         // set client id
         this->clientId = clientId;
         this->url = url;
-        
         if(url == "" || clientId == ""){
             std::cout << "No url assigned in config" << endl;
             return false;
@@ -34,13 +33,14 @@ public:
         ofxJSON jsonQueue;
         jsonQueue.openLocal("upload_queue.json");
         
-        // TODO: iterate backwards
         for(auto& i : jsonQueue){
             file file;
             file.path = i["path"].asString();
             file.transcriptionId = i["transcriptionId"].asString();
             queue.push(file);
         }
+        
+        return true;
     }
     
     ~FileUploader(){
@@ -55,7 +55,6 @@ public:
             json.append(element);
             queue.pop();
         }
-
         json.save("upload_queue.json");
     }
     
@@ -77,15 +76,25 @@ public:
         }
     }
     
+    std::string getLastUploadCode(){
+        return lastUploadCode;
+    }
+    
+    std::string getUrl(){
+        return url;
+    }
+    
 private:
     bool upload(file file){
-        bool uploadSuccess = true;
-
+        bool uploadSuccess = false;
         ofFilePath path;
-        
-        auto res = ofSystem("/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py") +
+        std::string res = ofSystem("/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py") +
                             " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
-        
+        uploadSuccess = ofToInt(res) == 200;
+        lastUploadCode = res;
+        if(lastUploadCode == ""){
+            lastUploadCode = "Py error";
+        }
         return uploadSuccess;
     }
     
@@ -93,6 +102,8 @@ private:
         while(queue.size() != 0){
             bool uploaded = upload(queue.front());
             if(uploaded){
+                ofFile file = ofFile(queue.front().path);
+                file.remove();
                 queue.pop();
             }
         }
@@ -101,6 +112,7 @@ private:
     std::queue<file> queue;
     std::string clientId = "";
     std::string url = "";
+    std::string lastUploadCode = "n/a";
 };
 
 
