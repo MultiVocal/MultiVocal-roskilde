@@ -65,6 +65,7 @@ void ofApp::draw(){
     // Draw transcription text
     ofSetColor(0);
     std::string transcription = transcriptions[currentTranscriptionIndex]["transcription_text"].asString();
+    std::string instructions = "Hold the button while reading the following sentence aloud";
     int numLines;
     bool wordsWereCropped;
     int size = 38;
@@ -78,6 +79,7 @@ void ofApp::draw(){
         ofSetColor(ofColor::darkGray);
     }
     
+    font.drawMultiLineColumn(instructions, size/2, margin, y/2, ofGetWidth()-margin*2, numLines, false, 2,true, &wordsWereCropped,true);
     font.drawMultiLineColumn(transcription, size, margin, y, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
     
     // Draw info

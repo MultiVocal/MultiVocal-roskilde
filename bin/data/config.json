@@ -1,2 +1,5 @@
-{"endpoint_url":"https://52.43.30.248:3000/api/recording","mp3_encode":false,"transcriptionIndex":339}
-
+{
+    "endpoint_url": "http://multivocal.org:3000/api/recording",
+    "mp3_encode": false,
+    "transcriptionIndex": 341
+}
