@@ -91,9 +91,6 @@ private:
                             " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
         uploadSuccess = ofToInt(res) == 200;
         lastUploadCode = res;
-        if(lastUploadCode == ""){
-            lastUploadCode = "Py error";
-        }
         return uploadSuccess;
     }
     
