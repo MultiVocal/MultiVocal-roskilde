@@ -16,8 +16,12 @@ void ofApp::setup(){
     // Setup audio recorder
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
+    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
 #else
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
+    inputChannels = 1;
+    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
+    soundStream.setDeviceID(2);
 #endif
     
     bEncodeMp3 = jsonConfig["mp3_ecode"].asBool();
@@ -30,7 +34,6 @@ void ofApp::setup(){
         audioRecorder.setAudioBitrate("1411k");
         minRecordingSize = 20000;
     }
-    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
     
     // setup uploader
     bool uploadSetup = fileUploader.setup(clientId, jsonConfig["endpoint_url"].asString());
