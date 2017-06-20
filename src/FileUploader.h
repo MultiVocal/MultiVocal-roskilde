@@ -88,13 +88,17 @@ private:
         bool uploadSuccess = false;
         ofFilePath path;
         std::string res;
+        std::string pythonVersion;
+        
 #ifdef TARGET_OSX
-        res = ofSystem("/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py") +
-                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
+        pythonVersion = "/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #else
-        res = ofSystem("python " + path.getAbsolutePath("scripts/upload.py") +
-                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
+        pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #endif
+
+        res = ofSystem(pythonVersion +
+                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
+        
         uploadSuccess = ofToInt(res) == 200;
         lastUploadCode = res;
         return uploadSuccess;
