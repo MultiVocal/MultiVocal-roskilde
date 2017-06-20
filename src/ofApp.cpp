@@ -99,7 +99,7 @@ void ofApp::draw(){
     // Legal notice
     ofSetColor(0);
     font.drawMultiLineColumn(legalNotice, 18, margin, ofGetHeight()-30, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
-
+    
     
     // Draw info
     if(bDebugDraw){
@@ -224,15 +224,24 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    if(!audioRecorder.isRecording()){
-        startRecording();
+    if(button == 0){
+        if(!audioRecorder.isRecording()){
+            startRecording();
+        }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-    if(audioRecorder.isRecording()){
-        stopRecording();
+    if(button == 0){
+        if(audioRecorder.isRecording()){
+            stopRecording();
+        }
+    }
+  
+    // TEMP
+    if(button == 2){
+        std::exit(0);
     }
 }
 
