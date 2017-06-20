@@ -100,6 +100,11 @@ private:
                        " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
         
         uploadSuccess = ofToInt(res) == 200;
+        
+        if(uploadSuccess){
+            ofLog(OF_LOG_NOTICE) << "Successfully uploaded: " << file.transcriptionId << endl;
+        }
+        
         lastUploadCode = res;
         return uploadSuccess;
     }
