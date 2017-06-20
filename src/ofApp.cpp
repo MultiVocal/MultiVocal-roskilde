@@ -16,13 +16,16 @@ void ofApp::setup(){
     // Setup audio recorder
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
-    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
+    outputChannels = 1;
 #else
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
-    soundStream.setup(this, 0, inputChannels, sampleRate, 256, 4);
+    outputChannels = 0;
     soundStream.setDeviceID(2);
 #endif
+    
+    // Setup soundStream
+    soundStream.setup(this, outputChannels, inputChannels, sampleRate, 256, 4);
     
     bEncodeMp3 = jsonConfig["mp3_ecode"].asBool();
     if(bEncodeMp3){
