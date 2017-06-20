@@ -58,13 +58,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-    // Save progress in config file
-    ofxJSON json;
-    json.openLocal("config.json");
-    json["transcriptionIndex"] = currentTranscriptionIndex;
-    json.save("config.json");
-    
-    ofLog(OF_LOG_NOTICE) << "Saved config as: config.json" << endl;
+
 }
 
 //--------------------------------------------------------------
@@ -167,6 +161,13 @@ void ofApp::stopRecording(){
             
             // todo: if recording OK
             goToNextTranscription();
+            
+            // Save progress in config file
+            ofxJSON json;
+            json.openLocal("config.json");
+            json["transcriptionIndex"] = currentTranscriptionIndex;
+            json.save("config.json");
+            ofLog(OF_LOG_NOTICE) << "Saved config as: config.json" << endl;
         }
     }
 }
