@@ -24,6 +24,8 @@ void ofApp::setup(){
     soundStream.setDeviceID(2);
 #endif
     
+    soundStream.printDeviceList();
+    
     // Setup soundStream
     soundStream.setup(this, outputChannels, inputChannels, sampleRate, 256, 4);
     
@@ -62,6 +64,7 @@ void ofApp::exit(){
     json["transcriptionIndex"] = currentTranscriptionIndex;
     json.save("config.json");
     
+    ofLog(OF_LOG_NOTICE) << "Saved config as: config.json" << endl;
 }
 
 //--------------------------------------------------------------
