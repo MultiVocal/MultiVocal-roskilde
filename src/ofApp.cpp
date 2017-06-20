@@ -37,7 +37,7 @@ void ofApp::setup(){
     }else{
         audioRecorder.setAudioCodec("pcm_s16le");
         audioRecorder.setAudioBitrate("1411k");
-        minRecordingSize = 20000;
+        minRecordingSize = 15000;
     }
     
     // setup uploader
