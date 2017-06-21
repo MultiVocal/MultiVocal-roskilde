@@ -49,16 +49,31 @@ void ofApp::setup(){
     }
     
     ofSetFrameRate(60);
+    
+    // Setup serial in
+    serial.setup("/dev/cu.usbmodem1411", baud);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     fileUploader.update();
+    
+    // Serial read
+    if(serial.isInitialized()){
+        readSerialIn();
+    }
+    
+    // Change recording state based on button
+    if(buttonPressed && !audioRecorder.isRecording()){
+        startRecording();
+    }else if(!buttonPressed && audioRecorder.isRecording()){
+        stopRecording();
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::exit(){
-
+    
 }
 
 //--------------------------------------------------------------
@@ -103,6 +118,11 @@ void ofApp::draw(){
         stringstream s;
         s << "Transcription #" + ofToString(currentTranscriptionIndex);
         s << "\nFPS: " + ofToString(ofGetFrameRate());
+        if(buttonPressed){
+            s << "\nButton pressed";
+        }else{
+            s << "\nButton NOT pressed";
+        }
         s << "\nAudio queue size: " + ofToString(audioRecorder.getVideoQueueSize());
         if(bEncodeMp3){
             s << "\nMP3 encoding enabled";
@@ -169,6 +189,34 @@ void ofApp::stopRecording(){
             json.save("config.json");
             ofLog(OF_LOG_NOTICE) << "Saved config as: config.json" << endl;
         }
+    }
+}
+
+//--------------------------------------------------------------
+void ofApp::readSerialIn(){
+    nTimesRead = 0;
+    nBytesRead = 0;
+    int nRead  = 0;  // a temp variable to keep count per read
+    unsigned char bytesReturned[3];
+    
+    memset(bytesReadString, 0, 4);
+    memset(bytesReturned, 0, 3);
+    
+    while( (nRead = serial.readBytes( bytesReturned, 3)) > 0){
+        nTimesRead++;
+        nBytesRead = nRead;
+    };
+    
+    memcpy(bytesReadString, bytesReturned, 3);
+    
+    if(ofToString(bytesReadString).find("1")){
+        if(buttonCounter > 10){
+            buttonPressed = false;
+        }
+        buttonCounter++;
+    }else{
+        buttonPressed = true;
+        buttonCounter = 0;
     }
 }
 
@@ -242,7 +290,7 @@ void ofApp::mouseReleased(int x, int y, int button){
             stopRecording();
         }
     }
-  
+    
     // TEMP
     if(button == 2){
         std::exit(0);

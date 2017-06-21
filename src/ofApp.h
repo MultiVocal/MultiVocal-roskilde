@@ -17,6 +17,7 @@ public:
     void stopRecording();
     void goToNextTranscription();
     void upload(std::string path);
+    void readSerialIn();
     void audioIn(float * input, int bufferSize, int nChannels);
 
     
@@ -48,6 +49,17 @@ public:
     int outputChannels = 2;
     int sampleRate = 44100;
     double minRecordingSize = 0;
+    
+    // Button stuff
+    ofSerial serial;
+    int baud = 9600;
+    char		bytesRead[3];				// data from serial, we will be trying to read 3
+    char		bytesReadString[4];			// a string needs a null terminator, so we need 3 + 1 bytes
+    int			nBytesRead;					// how much did we read?
+    int			nTimesRead;					// how many times did we read?
+    int buttonCounter = 0;
+    bool buttonPressed = false;
+
 
     FileUploader fileUploader;
 };
