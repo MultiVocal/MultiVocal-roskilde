@@ -17,11 +17,17 @@ void ofApp::setup(){
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
     outputChannels = 1;
+    
+    // Setup serial in
+    serial.setup("/dev/cu.usbmodem1411", baud);
 #else
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
     soundStream.setDeviceID(2);
+    
+    // Setup serial in
+    serial.setup("/dev/cu.usbmodem1411", baud);
 #endif
     
     soundStream.printDeviceList();
@@ -50,8 +56,6 @@ void ofApp::setup(){
     
     ofSetFrameRate(60);
     
-    // Setup serial in
-    serial.setup("/dev/cu.usbmodem1411", baud);
 }
 
 //--------------------------------------------------------------
