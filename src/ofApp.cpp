@@ -196,9 +196,7 @@ void ofApp::stopRecording(){
     if(file.exists()){
         if(file.getSize() > minRecordingSize){
             // Upload
-            if(file.getSize() < 10000){
-                fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
-            }
+            fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
             
             // Save queue locally
             fileUploader.saveQueueToFile();
