@@ -75,7 +75,6 @@ void ofApp::update(){
 #endif
     }
     
-    
     // Change recording state based on button
     if(buttonPressed && !audioRecorder.isRecording()){
         startRecording();
@@ -197,7 +196,12 @@ void ofApp::stopRecording(){
     if(file.exists()){
         if(file.getSize() > minRecordingSize){
             // Upload
-            fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
+            if(file.getSize() < 10000){
+                fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
+            }else{
+                // Remove if too large
+                file.remove();
+            }
             
             // Save queue locally
             fileUploader.saveQueueToFile();
