@@ -198,9 +198,6 @@ void ofApp::stopRecording(){
             // Upload
             if(file.getSize() < 10000){
                 fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
-            }else{
-                // Remove if too large
-                file.remove();
             }
             
             // Save queue locally
