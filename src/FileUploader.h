@@ -121,10 +121,7 @@ private:
     }
     
     void threadedFunction(){
-        while(queue.size() != 0){
-            
-            saveQueueToFile();
-            
+        while(queue.size() != 0){            
             // Try uploading
             bool uploaded = upload(queue.front());
             if(uploaded){

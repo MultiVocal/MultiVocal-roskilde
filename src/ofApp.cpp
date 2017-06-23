@@ -19,7 +19,7 @@ void ofApp::setup(){
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
     outputChannels = 1;
-#else
+#elif TARGET_LINUX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
@@ -27,8 +27,11 @@ void ofApp::setup(){
 #endif
     
     // Setup serial in
-    serial.listDevices();
+#ifdef TARGET_OSX
     serial.setup(serialPort, baud);
+#elif TARGET_LINUX
+    serial.setup();
+#endif
     
     soundStream.printDeviceList();
     
@@ -65,7 +68,11 @@ void ofApp::update(){
     if(serial.isInitialized()){
         readSerialIn();
     }else{
+#ifdef TARGET_OSX
         serial.setup(serialPort, baud);
+#elif TARGET_LINUX
+        serial.setup();
+#endif
     }
     
     
@@ -192,6 +199,9 @@ void ofApp::stopRecording(){
             // Upload
             fileUploader.addFile(path, transcriptions[currentTranscriptionIndex]["transcription_id"].asString());
             
+            // Save queue locally
+            fileUploader.saveQueueToFile();
+            
             // todo: if recording OK
             goToNextTranscription();
             
@@ -201,6 +211,9 @@ void ofApp::stopRecording(){
             json["transcriptionIndex"] = currentTranscriptionIndex;
             json.save("config.json");
             ofLog(OF_LOG_NOTICE) << "Saved config as: config.json" << endl;
+        }else{
+            // Remove if file is too small
+            file.remove();
         }
     }
 }
