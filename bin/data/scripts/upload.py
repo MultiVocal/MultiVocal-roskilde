@@ -27,12 +27,14 @@ def main(argv):
             url = arg
         elif opt in ("-t", "--transcription_id"):
             transcription_id = arg
-
-    file_ = {'file': (file_name, open(file_name, 'rb'))}
-    r = requests.post(url, files=file_, data={"transcription_id":
-                                              transcription_id})
-
-    print (r.status_code)
+    try:
+        file_ = {'file': (file_name, open(file_name, 'rb'))}
+        r = requests.post(url, files=file_, data={"transcription_id":
+                                                  transcription_id})
+        print (r.status_code)
+    except IOError:
+        file_ = ""
+        print(666)
 
 
 if __name__ == "__main__":

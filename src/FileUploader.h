@@ -112,6 +112,11 @@ private:
         
         uploadSuccess = ofToInt(res) == 200;
         
+        if(ofToInt(res) == 666){
+            // fileNotFound remove from queue
+            uploadSuccess = true;
+        }
+        
         if(uploadSuccess){
             ofLog(OF_LOG_NOTICE) << "Successfully uploaded: " << file.transcriptionId << endl;
         }
