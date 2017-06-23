@@ -19,7 +19,7 @@ void ofApp::setup(){
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
     outputChannels = 1;
-#elif TARGET_LINUX
+#else
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
@@ -29,7 +29,7 @@ void ofApp::setup(){
     // Setup serial in
 #ifdef TARGET_OSX
     serial.setup(serialPort, baud);
-#elif TARGET_LINUX
+#else
     serial.setup();
 #endif
     
@@ -70,7 +70,7 @@ void ofApp::update(){
     }else{
 #ifdef TARGET_OSX
         serial.setup(serialPort, baud);
-#elif TARGET_LINUX
+#else
         serial.setup();
 #endif
     }
