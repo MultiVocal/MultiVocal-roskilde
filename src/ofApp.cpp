@@ -12,23 +12,23 @@ void ofApp::setup(){
     ofxJSON jsonConfig;
     jsonConfig.openLocal("config.json");
     currentTranscriptionIndex = jsonConfig["transcriptionIndex"].asInt();
+    serialPort = jsonConfig["serial_port"].asString();
+    baud = jsonConfig["baud_rate"].asInt();
     
     // Setup audio recorder
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
     outputChannels = 1;
-    
-    // Setup serial in
-    serial.setup("/dev/cu.usbmodem1411", baud);
 #else
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
     soundStream.setDeviceID(2);
+#endif
     
     // Setup serial in
-    serial.setup("/dev/cu.usbmodem1411", baud);
-#endif
+    serial.listDevices();
+    serial.setup(serialPort, baud);
     
     soundStream.printDeviceList();
     
@@ -55,7 +55,6 @@ void ofApp::setup(){
     }
     
     ofSetFrameRate(60);
-    
 }
 
 //--------------------------------------------------------------
@@ -65,7 +64,10 @@ void ofApp::update(){
     // Serial read
     if(serial.isInitialized()){
         readSerialIn();
+    }else{
+        serial.setup(serialPort, baud);
     }
+    
     
     // Change recording state based on button
     if(buttonPressed && !audioRecorder.isRecording()){
@@ -100,22 +102,29 @@ void ofApp::draw(){
         ofSetColor(ofColor::darkGray);
     }
     
-    //Instructions
-    font.drawMultiLineColumn(instructions, size/2, margin, y-size*1.5, ofGetWidth()-margin*2, numLines, false, 2,true, &wordsWereCropped,true);
-    
-    if(audioRecorder.isRecording()){
+    if(serial.isInitialized()){
+        //Instructions
+        font.drawMultiLineColumn(instructions, size/2, margin, y-size*1.5, ofGetWidth()-margin*2, numLines, false, 2,true, &wordsWereCropped,true);
+        
+        if(audioRecorder.isRecording()){
+            ofSetColor(0);
+        }else{
+            ofSetColor(ofColor::darkGray);
+        }
+        
+        // Transcription
+        font.drawMultiLineColumn(transcription, size, margin, y, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
+        
+        // Legal notice
         ofSetColor(0);
+        font.drawMultiLineColumn(legalNotice, 18, margin, ofGetHeight()-30, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
     }else{
-        ofSetColor(ofColor::darkGray);
+        std::string notWorkingString = "The multivocal voicebox is currently out of order :(\ncheck back later!";
+        std::string linkString = "multivocal.org";
+        font.drawMultiLineColumn(notWorkingString, size, margin, y, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
+        
+        font.drawMultiLineColumn(linkString, 18, margin, ofGetHeight()-30, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
     }
-    
-    // Transcription
-    font.drawMultiLineColumn(transcription, size, margin, y, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
-    
-    // Legal notice
-    ofSetColor(0);
-    font.drawMultiLineColumn(legalNotice, 18, margin, ofGetHeight()-30, ofGetWidth()-margin, numLines, false, 2,true, &wordsWereCropped,true);
-    
     
     // Draw info
     if(bDebugDraw){
@@ -205,6 +214,7 @@ void ofApp::readSerialIn(){
     
     memset(bytesReadString, 0, 4);
     memset(bytesReturned, 0, 3);
+    
     
     while( (nRead = serial.readBytes( bytesReturned, 3)) > 0){
         nTimesRead++;
