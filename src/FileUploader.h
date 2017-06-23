@@ -43,18 +43,29 @@ public:
     }
     
     ~FileUploader(){
-        // Add all elements to JSON
-        ofxJSON json;
-        
-        // Add to JSON-queue
-        while(queue.size() != 0){
-            ofxJSONElement element;
-            element["path"] = queue.front().path;
-            element["transcriptionId"] = queue.front().transcriptionId;
-            json.append(element);
-            queue.pop();
+        saveQueueToFile();
+    }
+    
+    void saveQueueToFile(){
+        // Delete old jsonQueue if current queue is empty
+        if(queue.empty()){
+            ofFile localQueue = ofFile("upload_queue.json");
+            localQueue.remove();
+        }else{
+            // Add all elements to JSON
+            ofxJSON json;
+            std::queue<file> tempQueue = queue; //copy the original queue to the temporary queue
+            
+            // Add to JSON-queue
+            while(!tempQueue.empty()){
+                ofxJSONElement element;
+                element["path"] = queue.front().path;
+                element["transcriptionId"] = queue.front().transcriptionId;
+                json.append(element);
+                tempQueue.pop();
+            }
+            json.save("upload_queue.json");
         }
-        json.save("upload_queue.json");
     }
     
     void addFile(std::string path, std::string transcriptionId){
@@ -95,7 +106,7 @@ private:
 #else
         pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #endif
-
+        
         res = ofSystem(pythonVersion +
                        " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
         
@@ -111,6 +122,10 @@ private:
     
     void threadedFunction(){
         while(queue.size() != 0){
+            
+            saveQueueToFile();
+            
+            // Try uploading
             bool uploaded = upload(queue.front());
             if(uploaded){
                 ofFile file = ofFile(queue.front().path);
@@ -119,7 +134,7 @@ private:
             }
         }
     };
-
+    
     std::queue<file> queue;
     std::string clientId = "";
     std::string url = "";
