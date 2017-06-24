@@ -4,6 +4,7 @@ import json
 import sys
 import getopt
 import os
+import urllib2
 
 
 def main(argv):
@@ -27,15 +28,22 @@ def main(argv):
             url = arg
         elif opt in ("-t", "--transcription_id"):
             transcription_id = arg
+
+    try:
+        urllib2.urlopen('http://www.google.com', timeout=1)
+    except urllib2.URLError as err:
+        print(123)  # no internet
+        exit()
     try:
         file_ = {'file': (file_name, open(file_name, 'rb'))}
         r = requests.post(url, files=file_, data={"transcription_id":
                                                   transcription_id})
         print (r.status_code)
     except IOError:
-        print(666) # File not found
+        print(666)  # File not found
     except:
-        print(123) # All other errors
+        print(123)  # All other errors
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
