@@ -33,9 +33,9 @@ def main(argv):
                                                   transcription_id})
         print (r.status_code)
     except IOError:
-        file_ = ""
-        print(666)
-
+        print(666) # File not found
+    except:
+        print(123) # All other errors
 
 if __name__ == "__main__":
     main(sys.argv[1:])
