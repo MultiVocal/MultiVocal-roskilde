@@ -108,8 +108,12 @@ private:
         pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #endif
         
-        res = ofSystem(pythonVersion +
-                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId + " -c " + this->clientId);
+        std::string command = pythonVersion +
+        " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId + " -c " + this->clientId;
+        
+        res = ofSystem(command);
+        
+        std::cout << command << endl;
 
         uploadSuccess = ofToInt(res) == 200;
 
