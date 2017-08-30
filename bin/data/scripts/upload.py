@@ -15,7 +15,7 @@ def main(argv):
 
     try:
         opts, args = getopt.getopt(
-            argv, "hf:u:t:", ["file=", "url=", "transcription_id="])
+            argv, "hf:u:t:c", ["file=", "url=", "transcription_id=", "client_id="])
     except getopt.GetoptError:
         print 'test.py -i <inputfile> -o <outputfile>'
         sys.exit(2)

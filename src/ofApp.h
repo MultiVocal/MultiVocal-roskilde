@@ -37,9 +37,11 @@ public:
     int currentTranscriptionIndex = 0;
     ofxFontStash font;
     bool bDebugDraw = true;
-    std::string clientId = "RoskildeFestival-2017";
+    bool bDebugMode = true; // Overrule serial read
+    std::string clientId = "dev";
     std::string legalNotice = "By participating you allow your recording to be used in the creation of a synthesized voice - more info at multivocal.org";
     std::string instructions = "Hold the button while reading the following sentence aloud:";
+    
     
     // sound recording
     ofxVideoRecorder audioRecorder;

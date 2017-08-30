@@ -27,7 +27,7 @@ public:
             std::cout << "No url assigned in config" << endl;
             return false;
         }
-
+        
         // Open local queue
         ofxJSON jsonQueue;
         jsonQueue.openLocal("upload_queue.json");
@@ -107,7 +107,7 @@ private:
 #else
         pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #endif
-
+        
         res = ofSystem(pythonVersion +
                        " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId + " -c " + this->clientId);
 

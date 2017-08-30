@@ -14,6 +14,9 @@ void ofApp::setup(){
     currentTranscriptionIndex = jsonConfig["transcriptionIndex"].asInt();
     serialPort = jsonConfig["serial_port"].asString();
     baud = jsonConfig["baud_rate"].asInt();
+    if(jsonConfig["client_id"].asString().compare("")){
+        this->clientId = jsonConfig["client_id"].asString();
+    }
     
     // Setup audio recorder
 #ifdef TARGET_OSX
@@ -64,22 +67,26 @@ void ofApp::setup(){
 void ofApp::update(){
     fileUploader.update();
     
-    // Serial read
-    if(serial.isInitialized()){
-        readSerialIn();
-    }else{
+    if(!bDebugMode){
+        // Serial read
+        if(serial.isInitialized()){
+            readSerialIn();
+        }else{
 #ifdef TARGET_OSX
-        serial.setup(serialPort, baud);
+            serial.setup(serialPort, baud);
 #else
-        serial.setup();
+            serial.setup();
 #endif
+        }
     }
     
-    // Change recording state based on button
-    if(buttonPressed && !audioRecorder.isRecording()){
-        startRecording();
-    }else if(!buttonPressed && audioRecorder.isRecording()){
-        stopRecording();
+    if(!bDebugMode){
+        // Change recording state based on button
+        if(buttonPressed && !audioRecorder.isRecording()){
+            startRecording();
+        }else if(!buttonPressed && audioRecorder.isRecording()){
+            stopRecording();
+        }
     }
 }
 
@@ -108,7 +115,7 @@ void ofApp::draw(){
         ofSetColor(ofColor::darkGray);
     }
     
-    if(serial.isInitialized()){
+    if(serial.isInitialized() || !bDebugMode){
         //Instructions
         font.drawMultiLineColumn(instructions, size/2, margin, y-size*1.5, ofGetWidth()-margin*2, numLines, false, 2,true, &wordsWereCropped,true);
         
@@ -268,6 +275,7 @@ void ofApp::goToNextTranscription(){
 void ofApp::keyPressed(int key){
     if((key == 'g' || key == 'G') && !audioRecorder.isRecording()){
         startRecording();
+        buttonPressed = true;
     }
 }
 
@@ -283,10 +291,15 @@ void ofApp::keyReleased(int key){
     
     if((key == 'g' || key == 'G') && audioRecorder.isRecording()){
         stopRecording();
+        buttonPressed = false;
+    }
+    
+    if(key == 'i' || key == 'I'){
+        bDebugDraw = !bDebugDraw;
     }
     
     if(key == 'd' || key == 'D'){
-        bDebugDraw = !bDebugDraw;
+        bDebugMode = !bDebugMode;
     }
 }
 
