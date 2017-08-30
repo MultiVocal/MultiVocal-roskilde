@@ -27,24 +27,24 @@ public:
             std::cout << "No url assigned in config" << endl;
             return false;
         }
-        
+
         // Open local queue
         ofxJSON jsonQueue;
         jsonQueue.openLocal("upload_queue.json");
-        
+
         for(auto& i : jsonQueue){
             file file;
             file.path = i["path"].asString();
             file.transcriptionId = i["transcriptionId"].asString();
             queue.push(file);
         }
-        
+
         return true;
     }
-    
+
     ~FileUploader(){
     }
-    
+
     void saveQueueToFile(){
         // Delete old jsonQueue if current queue is empty
         if(queue.empty()){
@@ -54,7 +54,7 @@ public:
             // Add all elements to JSON
             ofxJSON json;
             std::queue<file> tempQueue = queue; //copy the original queue to the temporary queue
-            
+
             // Add to JSON-queue
             while(!tempQueue.empty()){
                 ofxJSONElement element;
@@ -66,7 +66,7 @@ public:
             json.save("upload_queue.json");
         }
     }
-    
+
     void addFile(std::string path, std::string transcriptionId){
         // Add to queue
         file file;
@@ -74,58 +74,60 @@ public:
         file.transcriptionId = transcriptionId;
         queue.push(file);
     }
-    
+
     int getQueueSize(){
         return queue.size();
     }
-    
+
     void update(){
         if(!this->isThreadRunning()){
             this->startThread();
         }
     }
-    
+
     std::string getLastUploadCode(){
         return lastUploadCode;
     }
-    
+
     std::string getUrl(){
         return url;
     }
-    
+
 private:
     bool upload(file file){
         bool uploadSuccess = false;
         ofFilePath path;
         std::string res;
         std::string pythonVersion;
-        
+
 #ifdef TARGET_OSX
         pythonVersion = "/usr/local/bin/python " + path.getAbsolutePath("scripts/upload.py");
+#elif __arm__
+        pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #else
         pythonVersion = "/usr/bin/python " + path.getAbsolutePath("scripts/upload.py");
 #endif
-        
+
         res = ofSystem(pythonVersion +
-                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId);
-        
+                       " -f"  + file.path + " -u " + this->url + " -t " + file.transcriptionId + " -c " + this->clientId);
+
         uploadSuccess = ofToInt(res) == 200;
-        
+
         if(ofToInt(res) == 666){
             // fileNotFound remove from queue
             uploadSuccess = true;
         }
-        
+
         if(uploadSuccess){
             ofLog(OF_LOG_NOTICE) << "Successfully uploaded: " << file.transcriptionId << endl;
         }
-        
+
         lastUploadCode = res;
         return uploadSuccess;
     }
-    
+
     void threadedFunction(){
-        while(queue.size() != 0){            
+        while(queue.size() != 0){
             // Try uploading
             bool uploaded = upload(queue.front());
             if(uploaded){
@@ -135,7 +137,7 @@ private:
             }
         }
     };
-    
+
     std::queue<file> queue;
     std::string clientId = "";
     std::string url = "";
