@@ -26,7 +26,7 @@ void ofApp::setup(){
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
-    soundStream.setDeviceID(3);
+    soundStream.setDeviceID(2);
 #endif
     
     // Setup serial in
