@@ -37,7 +37,7 @@ public:
     int currentTranscriptionIndex = 0;
     ofxFontStash font;
     bool bDebugDraw = true;
-    bool bDebugMode = true; // Overrule serial read
+    bool bDebugMode = false; // Overrule serial read
     std::string clientId = "dev";
     std::string legalNotice = "By participating you allow your recording to be used in the creation of a synthesized voice - more info at multivocal.org";
     std::string instructions = "Hold the button while reading the following sentence aloud:";
