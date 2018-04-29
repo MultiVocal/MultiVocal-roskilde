@@ -1,2 +1,2 @@
-{"baud_rate":9600,"client_id":"","endpoint_url":"http://multivocal.org:3000/api/recording","mp3_encode":false,"serial_port":"/dev/tty.usbmodem1411","transcriptionIndex":9}
+{"baud_rate":9600,"client_id":"","endpoint_url":"http://multivocal.org:3000/api/recording","mp3_encode":false,"serial_port":"/dev/tty.usbmodem1411","transcriptionIndex":10}
 
