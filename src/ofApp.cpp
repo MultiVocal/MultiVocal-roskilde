@@ -22,7 +22,7 @@ void ofApp::setup(){
 #ifdef TARGET_OSX
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_mac"));
     outputChannels = 1;
-#else
+#elif __arm__
     audioRecorder.setFfmpegLocation(ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
     inputChannels = 1;
     outputChannels = 0;
