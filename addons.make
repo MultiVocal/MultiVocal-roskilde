@@ -1,3 +1,4 @@
 ofxFontStash
+ofxGPIO
 ofxJSON
 ofxVideoRecorder

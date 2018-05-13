@@ -6,6 +6,11 @@
 #include "ofxJSON.h"
 #include "ofxVideoRecorder.h"
 
+#ifdef __arm__
+#include "ofxGPIO.h"
+#endif
+
+
 class ofApp : public ofBaseApp{
     
 public:
@@ -62,6 +67,12 @@ public:
     int	nTimesRead;					// how many times did we read?
     int buttonCounter = 0;
     bool buttonPressed = false;
+    
+    // GPIO
+#ifdef __arm__
+    GPIO gpio;
+#endif
+
     
     
     FileUploader fileUploader;
