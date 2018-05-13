@@ -85,7 +85,7 @@ void ofApp::update(){
         // GPIO read
         std::string stateButton;
         gpio.getval_gpio(stateButton);
-        if(stateButton == "1"){
+        if(stateButton == "0"){
             buttonPressed = true;
         }else{
             buttonPressed = false;
