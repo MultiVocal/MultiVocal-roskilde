@@ -50,7 +50,7 @@ def main(argv):
                                      client_id,
                                      "file_name": file_name})
         print(r.status_code)
-    except IOError:
+    except (IOError, ValueError):
         print(666)  # File not found
 
 
