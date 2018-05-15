@@ -85,15 +85,17 @@ void ofApp::update(){
         // GPIO read
         std::string stateButton;
         gpio.getval_gpio(stateButton);
-        if(stateButton == "0"){
+    if(stateButton == "0"){
+        if(buttonCounter > 10){
             buttonPressed = true;
         }else{
-            buttonPressed = false;
-        }
+		buttonCounter++;
+	}
+    }else{
+        buttonPressed = false;
+        buttonCounter = 0;
+    }
 #endif
-        
-        
-        
     }
     
     if(!bDebugMode){
@@ -174,6 +176,7 @@ void ofApp::draw(){
         s << "\nUrl: " + ofToString(fileUploader.getUrl());
         s << "\nFile queue size: " + ofToString(fileUploader.getQueueSize());
         s << "\nLast upload: " + ofToString(fileUploader.getLastUploadCode());
+        s << "\nButton counter: " + ofToString(buttonCounter);
         s << endl;
         ofDrawBitmapStringHighlight(s.str(), 10, 10);
     }
