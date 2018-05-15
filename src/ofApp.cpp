@@ -32,8 +32,11 @@ void ofApp::setup(){
     // Setup serial in
 #ifdef TARGET_OSX
     serial.setup(serialPort, baud);
-#else
-    serial.setup();
+#elif __arm__
+    // GPIO setup
+    gpio.setup("3");
+    gpio.export_gpio();
+    gpio.setdir_gpio("in");
 #endif
     
     soundStream.printDeviceList();
@@ -71,16 +74,26 @@ void ofApp::update(){
     fileUploader.update();
     
     if(!bDebugMode){
+#ifdef TARGET_OSX
         // Serial read
         if(serial.isInitialized()){
             readSerialIn();
         }else{
-#ifdef TARGET_OSX
             serial.setup(serialPort, baud);
-#else
-            serial.setup();
-#endif
         }
+#elif __arm__
+        // GPIO read
+        std::string stateButton;
+        gpio.getval_gpio(stateButton);
+        if(stateButton == "0"){
+            buttonPressed = true;
+        }else{
+            buttonPressed = false;
+        }
+#endif
+        
+        
+        
     }
     
     if(!bDebugMode){
