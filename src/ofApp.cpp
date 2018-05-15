@@ -76,11 +76,11 @@ void ofApp::update(){
     if(!bDebugMode){
 #ifdef TARGET_OSX
         // Serial read
-        if(serial.isInitialized()){
-            readSerialIn();
-        }else{
-            serial.setup(serialPort, baud);
-        }
+//        if(serial.isInitialized()){
+//            readSerialIn();
+//        }else{
+//            serial.setup(serialPort, baud);
+//        }
 #elif __arm__
         // GPIO read
         std::string stateButton;
