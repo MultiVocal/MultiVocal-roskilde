@@ -1,2 +1,5 @@
-{"baud_rate":9600,"client_id":"59a46b9e91338a44c768ba40","mp3_encode":false,"serial_port":"/dev/tty.usbmodem1411","transcriptionIndex":52}
-
+{
+  "client_id": "59a46b9e91338a44c768ba40",
+  "mp3_encode": false,
+  "transcriptionIndex": 600
+}
