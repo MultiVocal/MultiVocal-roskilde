@@ -24,7 +24,7 @@ void ofApp::setup() {
 #elif __arm__
   audioRecorder.setFfmpegLocation(
       ofFilePath::getAbsolutePath("ffmpeg/ffmpeg_arm"));
-  inputChannels = 2;
+  inputChannels = 1;
   outputChannels = 0;
   soundStream.setDeviceID(2);
 #endif
