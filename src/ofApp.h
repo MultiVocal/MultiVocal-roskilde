@@ -38,7 +38,7 @@ public:
   ofxJSON transcriptions;
   int currentTranscriptionIndex = 0;
   ofxFontStash font;
-  bool bDebugDraw = true;
+  bool bDebugDraw = false;
   bool bDebugMode = false; // Overrule serial read
   std::string clientId = "dev";
   std::string legalNotice = "By participating you allow your recording to be "
