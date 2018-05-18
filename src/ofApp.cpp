@@ -12,8 +12,6 @@ void ofApp::setup() {
   ofxJSON jsonConfig;
   jsonConfig.openLocal("config.json");
   currentTranscriptionIndex = jsonConfig["transcriptionIndex"].asInt();
-  serialPort = jsonConfig["serial_port"].asString();
-  baud = jsonConfig["baud_rate"].asInt();
   if (jsonConfig["client_id"].asString().compare("")) {
     this->clientId = jsonConfig["client_id"].asString();
   }
@@ -32,9 +30,7 @@ void ofApp::setup() {
 #endif
 
 // Setup serial in
-#ifdef TARGET_OSX
-  serial.setup(serialPort, baud);
-#elif __arm__
+#ifdef __arm__
   // GPIO setup
   gpio.setup("3");
   gpio.export_gpio();
@@ -45,7 +41,6 @@ void ofApp::setup() {
 
   // Setup soundStream
   soundStream.setup(this, outputChannels, inputChannels, sampleRate, 256, 4);
-
   bEncodeMp3 = jsonConfig["mp3_ecode"].asBool();
   if (bEncodeMp3) {
     audioRecorder.setAudioCodec("mp3");
@@ -66,9 +61,6 @@ void ofApp::setup() {
   }
 
   ofSetFrameRate(60);
-
-  // Set logging levels
-  ofSetLogLevel("ofSerial", OF_LOG_WARNING);
 }
 
 //--------------------------------------------------------------
@@ -76,14 +68,7 @@ void ofApp::update() {
   fileUploader.update();
 
   if (!bDebugMode) {
-#ifdef TARGET_OSX
-// Serial read
-//        if(serial.isInitialized()){
-//            readSerialIn();
-//        }else{
-//            serial.setup(serialPort, baud);
-//        }
-#elif __arm__
+#ifdef __arm__
     // GPIO read
     std::string stateButton;
     gpio.getval_gpio(stateButton);
@@ -135,7 +120,7 @@ void ofApp::draw() {
     ofSetColor(ofColor::darkGray);
   }
 
-  if (serial.isInitialized() || !bDebugMode) {
+  if (!bDebugMode) {
     // Instructions
     font.drawMultiLineColumn(instructions, size / 2, margin, y - size * 1.5,
                              ofGetWidth() - margin * 2, numLines, false, 2,
@@ -189,7 +174,7 @@ void ofApp::draw() {
     s << "\nFile queue size: " + ofToString(fileUploader.getQueueSize());
     s << "\nLast upload: " + ofToString(fileUploader.getLastUploadCode());
     s << "\nButton counter: " + ofToString(buttonCounter);
-	  s << "\nifconfig: " + networkInfo;
+    s << "\nifconfig: " + networkInfo;
     s << endl;
     ofDrawBitmapStringHighlight(s.str(), 10, 10);
   }
@@ -263,35 +248,6 @@ void ofApp::stopRecording() {
     }
   }
 }
-
-//--------------------------------------------------------------
-void ofApp::readSerialIn() {
-  nTimesRead = 0;
-  nBytesRead = 0;
-  int nRead = 0; // a temp variable to keep count per read
-  unsigned char bytesReturned[3];
-
-  memset(bytesReadString, 0, 4);
-  memset(bytesReturned, 0, 3);
-
-  while ((nRead = serial.readBytes(bytesReturned, 3)) > 0) {
-    nTimesRead++;
-    nBytesRead = nRead;
-  };
-
-  memcpy(bytesReadString, bytesReturned, 3);
-
-  if (ofToString(bytesReadString).find("1")) {
-    if (buttonCounter > 10) {
-      buttonPressed = false;
-    }
-    buttonCounter++;
-  } else {
-    buttonPressed = true;
-    buttonCounter = 0;
-  }
-}
-
 //--------------------------------------------------------------
 void ofApp::audioIn(float *input, int bufferSize, int nChannels) {
   if (audioRecorder.isRecording()) {
@@ -301,7 +257,6 @@ void ofApp::audioIn(float *input, int bufferSize, int nChannels) {
 
 //--------------------------------------------------------------
 void ofApp::goToNextTranscription() {
-  // Increment index
   currentTranscriptionIndex++;
 
   // Start over if limited was reached
